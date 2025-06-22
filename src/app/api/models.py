@@ -28,7 +28,11 @@ class Supervisor(CustomUser):
 
 class Employee(CustomUser):
     assigned_supervisor = models.ForeignKey(
-        Supervisor, on_delete=models.SET_NULL, null=True, related_name="employees"
+        Supervisor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=False,
+        related_name="employees",
     )
     leave_requests_left = models.IntegerField(default=30)
 
