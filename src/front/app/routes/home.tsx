@@ -7,7 +7,7 @@ import LoginOptionBtn, {
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Leave Request Portal" },
+    { title: "Welcome - Leave Request Portal" },
     {
       name: "description",
       content:
@@ -42,11 +42,11 @@ export default function Home() {
 const loginOptions: LoginOptionBtnProps[] = [
   {
     color: "warning",
-    title: "Website Admin",
+    title: "Admin",
     href: "/admin",
     img: {
       src: "admin-thumbnail.png",
-      alt: "Login as Website Admin",
+      alt: "Login as Admin",
     },
   },
   {
