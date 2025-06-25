@@ -15,6 +15,8 @@ import "@fontsource/roboto/700.css";
 import "./app.css";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -29,6 +31,18 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+const theme = createTheme({
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+        },
+      },
+    },
+  },
+});
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -39,7 +53,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ThemeProvider theme={theme}>
+          {children}
+          <CssBaseline />
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
