@@ -9,5 +9,7 @@ export default [
   layout("layouts/RootLayout.tsx", [
     index("routes/home.tsx"),
     route("login", "routes/login.tsx"),
+    route("employee-dashboard", "routes/employee-dashboard.tsx"),
+    route("supervisor-dashboard", "routes/supervisor-dashboard.tsx"),
   ]),
 ] satisfies RouteConfig;
