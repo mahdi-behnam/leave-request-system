@@ -38,7 +38,7 @@ const CustomDrawer: React.FC<Props> = ({
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Permanent drawer
+            Leave Request Portal
           </Typography>
         </Toolbar>
       </AppBar>
@@ -73,7 +73,13 @@ const CustomDrawer: React.FC<Props> = ({
       </Drawer>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+        sx={{
+          flexGrow: 1,
+          bgcolor: "background.default",
+          p: 3,
+          width: `calc(100% - ${drawerWidth}px)`,
+          ml: `${drawerWidth}px`,
+        }}
       >
         <Toolbar />
         <Box className="tab-content-wrapper">{children}</Box>

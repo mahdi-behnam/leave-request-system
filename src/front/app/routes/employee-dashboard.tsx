@@ -7,6 +7,7 @@ import CustomDrawer, {
 } from "~/components/dashboard/CustomDrawer";
 import TransferWithinAStationOutlinedIcon from "@mui/icons-material/TransferWithinAStationOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import LeaveRequestsTab from "~/components/dashboard/employee/LeaveRequestsTab";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Employee - Leave Request Portal" }];
@@ -22,7 +23,7 @@ export default function EmployeeDashboard() {
         activeTabIndex={activeTabIndex}
         setActiveTabIndex={setActiveTabIndex}
       >
-        {activeTabIndex === 0 && <Typography>Index - 0</Typography>}
+        {activeTabIndex === 0 && <LeaveRequestsTab />}
         {activeTabIndex === 1 && <Typography>Index - 1</Typography>}
       </CustomDrawer>
     </Box>
