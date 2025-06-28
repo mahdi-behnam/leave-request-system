@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import SubmitNewRequestForm from "./SubmitNewRequestForm";
+import type { LeaveRequest } from "~/types";
 
 const columns: GridColDef[] = [
   {
@@ -119,7 +120,7 @@ const LeaveRequestsTab = () => {
   return (
     <Box className="leave-requests-tab-content">
       <Typography variant="h5">Requests List</Typography>
-      <Typography variant="body1">
+      <Typography variant="body1" gutterBottom>
         Here you can view and manage your leave requests.
       </Typography>
       <Stack

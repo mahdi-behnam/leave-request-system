@@ -13,18 +13,23 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Collapse from "@mui/material/Collapse";
-import { useRoleRedirect } from "~/hooks/useRoleRedirect";
+import { useLoginRoleRedirect } from "~/hooks/useLoginRoleRedirect";
+import { useUser } from "~/contexts/UserContext";
+import { useNavigate } from "react-router";
+import { UserRole, type User } from "~/types";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login - Leave Request Portal" }];
 }
 
 export default function Login() {
-  useRoleRedirect();
-
+  const currentPageRole = useLoginRoleRedirect();
+  const navigate = useNavigate();
+  const { user, setUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleEmailChange = (
@@ -52,9 +57,38 @@ export default function Login() {
   const handleSubmitBtn = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      setIsLoggingIn(true);
       // TODO: Implement login logic here
-      console.log("email: ", email);
-      console.log("password: ", password);
+      setTimeout(() => {
+        console.log("email: ", email);
+        console.log("password: ", password);
+        const dummyResponse: User = {
+          email: "mahdi@gmail.com",
+          firstName: "Mahdi",
+          lastName: "Behnam",
+          role: UserRole.EMPLOYEE,
+          nationalId: "1234567890",
+          phoneNumber: "09123456789",
+          assignedSupervisor: {
+            firstName: "Javad",
+            lastName: "Javadi",
+            email: "javad@gmail.com",
+            nationalId: "1363028731",
+            phoneNumber: "09123536363",
+            role: UserRole.SUPERVISOR,
+          },
+          leaveRequestsLeft: 30,
+        };
+        setUser(dummyResponse);
+        // Redirect to the appropriate dashboard based on the user's role
+        navigate(
+          currentPageRole === "employee"
+            ? "/employee-dashboard"
+            : currentPageRole === "supervisor"
+            ? "/supervisor-dashboard"
+            : "/"
+        );
+      }, 1000);
     } catch (err) {
       console.error("Login error: ", err);
       setError("An error occurred while logging in. Please try again.");
@@ -83,12 +117,13 @@ export default function Login() {
         onSubmit={handleSubmitBtn}
       >
         <TextField
+          required
           label="Email"
           type="email"
           value={email}
           onChange={handleEmailChange}
         />
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" required>
           <InputLabel htmlFor="password-field">Password</InputLabel>
           <OutlinedInput
             id="password-field"
@@ -116,6 +151,7 @@ export default function Login() {
           fullWidth
           type="submit"
           sx={{ py: 1 }}
+          loading={isLoggingIn}
         >
           Login
         </Button>
