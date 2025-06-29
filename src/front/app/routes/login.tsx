@@ -62,22 +62,33 @@ export default function Login() {
       setTimeout(() => {
         console.log("email: ", email);
         console.log("password: ", password);
+        // const dummyResponse: User = {
+        // id: "1",
+        //   email: "mahdi@gmail.com",
+        //   firstName: "Mahdi",
+        //   lastName: "Behnam",
+        //   role: UserRole.EMPLOYEE,
+        //   nationalId: "1234567890",
+        //   phoneNumber: "09123456789",
+        //   assignedSupervisor: {
+        //     id: "2",
+        //     firstName: "Javad",
+        //     lastName: "Javadi",
+        //     email: "javad@gmail.com",
+        //     nationalId: "1363028731",
+        //     phoneNumber: "09123536363",
+        //     role: UserRole.SUPERVISOR,
+        //   },
+        //   leaveRequestsLeft: 30,
+        // };
         const dummyResponse: User = {
+          id: "1",
           email: "mahdi@gmail.com",
           firstName: "Mahdi",
           lastName: "Behnam",
-          role: UserRole.EMPLOYEE,
+          role: UserRole.SUPERVISOR,
           nationalId: "1234567890",
           phoneNumber: "09123456789",
-          assignedSupervisor: {
-            firstName: "Javad",
-            lastName: "Javadi",
-            email: "javad@gmail.com",
-            nationalId: "1363028731",
-            phoneNumber: "09123536363",
-            role: UserRole.SUPERVISOR,
-          },
-          leaveRequestsLeft: 30,
         };
         setUser(dummyResponse);
         // Redirect to the appropriate dashboard based on the user's role
