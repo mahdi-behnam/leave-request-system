@@ -1,21 +1,35 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+
+from app.api.managers import UserManager
 
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=80)
     last_name = models.CharField(max_length=100)
     national_id = models.CharField(max_length=10, unique=True)
     phone_number = models.CharField(max_length=11, blank=True, null=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.first_name + " " + self.last_name
+    objects = UserManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []  # List of fields required by createsuperuser command
 
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
         ordering = ["date_joined"]
+
+    def get_full_name(self):
+        """
+        Returns the first_name plus the last_name, with a space in between.
+        """
+        full_name = self.first_name + " " + self.last_name
+        return full_name.strip()
 
 
 class Supervisor(CustomUser):
