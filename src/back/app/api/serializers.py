@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from app.api.models import Supervisor, Employee, LeaveRequest
 
 
@@ -17,6 +18,7 @@ class SupervisorSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Employee
         fields = [

@@ -1,41 +1,33 @@
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, generics
+from rest_framework.permissions import IsAuthenticated
 
-from app.api.models import Supervisor, Employee, LeaveRequest
-from app.api.serializers import (
-    SupervisorSerializer,
+from .models import Supervisor, Employee, LeaveRequest
+from .serializers import (
     EmployeeSerializer,
-    LeaveRequestSerializer,
 )
+from .permissions import IsSuperuserOrSupervisor
 
 
-class SupervisorViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows supervisors to be viewed or edited.
-    """
-
-    queryset = Supervisor.objects.all()
-    serializer_class = SupervisorSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class EmployeeViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows employees to be viewed or edited.
-    """
-
+class EmployeeCreateView(generics.CreateAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-
-class LeaveRequestViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows leave requests to be viewed or edited.
-    """
-
-    queryset = LeaveRequest.objects.all()
-    serializer_class = LeaveRequestSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperuserOrSupervisor]
 
     def perform_create(self, serializer):
-        serializer.save(employee=self.request.user.employee)
+        if self.request.user.is_superuser():
+            serializer.save(assigned_supervisor=self.request.user)
+        else:
+            serializer.save()
+
+
+class EmployeeListView(generics.ListAPIView):
+    serializer_class = EmployeeSerializer
+    permission_classes = [IsAuthenticated, IsSuperuserOrSupervisor]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Employee.objects.all()
+        elif user.is_supervisor() == "Supervisor":
+            return Employee.objects.filter(assigned_supervisor=user)
+        return Employee.objects.none()

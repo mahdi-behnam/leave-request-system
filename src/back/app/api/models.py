@@ -24,6 +24,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = "Users"
         ordering = ["date_joined"]
 
+    def is_supervisor(self):
+        return isinstance(self, Supervisor)
+
+    def is_employee(self):
+        return isinstance(self, Employee)
+
+    def is_employee_or_supervisor(self):
+        return self.is_employee() or self.is_supervisor()
+
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
