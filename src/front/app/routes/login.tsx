@@ -19,6 +19,7 @@ import { useNavigate } from "react-router";
 import { UserRole, type User } from "~/types";
 import { fetchAuthToken, fetchUserProfile } from "~/services/auth";
 import { setAccessTokenInCookie } from "~/utils";
+import Link from "@mui/material/Link";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login - Leave Request Portal" }];
@@ -47,14 +48,6 @@ export default function Login() {
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-  };
-
-  const handleMouseUpPassword = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-  };
 
   const handleSubmitBtn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -123,12 +116,7 @@ export default function Login() {
             type={showPassword ? "text" : "password"}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  onMouseUp={handleMouseUpPassword}
-                  edge="end"
-                >
+                <IconButton onClick={handleClickShowPassword} edge="end">
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
@@ -136,6 +124,9 @@ export default function Login() {
             label="Password"
           />
         </FormControl>
+        {currentPageRole === "supervisor" && (
+          <Link href="/register-supervisor">Create an account?</Link>
+        )}
         <Button
           variant="contained"
           color="primary"
