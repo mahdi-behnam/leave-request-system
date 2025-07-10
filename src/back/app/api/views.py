@@ -54,3 +54,25 @@ class LeaveRequestCreateView(generics.CreateAPIView):
             serializer.save(employee=employee)
         else:
             serializer.save()
+
+
+class LeaveRequestListView(generics.ListAPIView):
+    queryset = LeaveRequest.objects.none()  # default fallback
+    serializer_class = LeaveRequestSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_superuser:
+            return LeaveRequest.objects.all()
+
+        elif user.is_supervisor():
+            supervisor = user.get_subclass_instance()
+            return LeaveRequest.objects.filter(employee__assigned_supervisor=supervisor)
+
+        elif user.is_employee():
+            employee = user.get_subclass_instance()
+            return LeaveRequest.objects.filter(employee=employee)
+
+        return LeaveRequest.objects.none()

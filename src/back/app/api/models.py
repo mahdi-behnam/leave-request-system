@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.forms import ValidationError
 
 from app.api.managers import UserManager
 
