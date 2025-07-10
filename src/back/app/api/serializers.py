@@ -85,3 +85,10 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         model = LeaveRequest
         fields = "__all__"
         read_only_fields = ["id", "employee", "status"]
+
+
+class LeaveRequestStatusUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LeaveRequest
+        fields = ["status"]

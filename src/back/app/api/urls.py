@@ -8,6 +8,7 @@ from .views import (
     SupervisorSignupView,
     LeaveRequestListView,
     LeaveRequestCreateView,
+    LeaveRequestStatusUpdateView,
 )
 
 router = routers.DefaultRouter()
@@ -26,5 +27,10 @@ urlpatterns = [
         "leave-requests/create/",
         LeaveRequestCreateView.as_view(),
         name="leave-request-create",
+    ),
+    path(
+        "leave-requests/<int:pk>/status/",
+        LeaveRequestStatusUpdateView.as_view(),
+        name="leave-request-status-update",
     ),
 ]

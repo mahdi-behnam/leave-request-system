@@ -1,5 +1,7 @@
-from rest_framework import permissions, viewsets, generics
+from rest_framework import permissions, viewsets, generics, status
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import PermissionDenied
 
 from .models import Supervisor, Employee, LeaveRequest
 from .serializers import (
@@ -7,6 +9,7 @@ from .serializers import (
     EmployeeSignupSerializer,
     LeaveRequestSerializer,
     SupervisorSignupSerializer,
+    LeaveRequestStatusUpdateSerializer,
 )
 from .permissions import IsSuperuserOrEmployee, IsSuperuserOrSupervisor
 
@@ -76,3 +79,48 @@ class LeaveRequestListView(generics.ListAPIView):
             return LeaveRequest.objects.filter(employee=employee)
 
         return LeaveRequest.objects.none()
+
+
+class LeaveRequestStatusUpdateView(generics.UpdateAPIView):
+    queryset = LeaveRequest.objects.all()
+    serializer_class = LeaveRequestStatusUpdateSerializer
+    permission_classes = [IsSuperuserOrSupervisor]
+
+    def get_object(self):
+        leave_request = super().get_object()
+        user = self.request.user
+
+        if user.is_superuser:
+            return leave_request
+
+        # If supervisor, ensure the leave request belongs to their employee
+        if user.is_supervisor():
+            supervisor = user.get_subclass_instance()
+            if leave_request.employee.assigned_supervisor == supervisor:
+                return leave_request
+
+        raise PermissionDenied(
+            "You don't have permission to modify this leave request."
+        )
+
+    def update(self, request, *args, **kwargs):
+        leave_request = self.get_object()
+        new_status = request.data.get("status")
+
+        if leave_request.status != LeaveRequest.LeaveStatus.PENDING:
+            return Response(
+                {"detail": "Leave request is not pending."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if new_status == LeaveRequest.LeaveStatus.APPROVED:
+            leave_request.approve_leave()
+        elif new_status == LeaveRequest.LeaveStatus.REJECTED:
+            leave_request.reject_leave()
+        else:
+            return Response(
+                {"detail": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = self.get_serializer(leave_request)
+        return Response(serializer.data)
