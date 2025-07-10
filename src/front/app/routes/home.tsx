@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import LoginOptionBtn, {
   type LoginOptionBtnProps,
 } from "~/components/home/LoginOptionBtn";
+import { adminLoginUrl } from "~/constants/linksConfig";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -43,7 +44,7 @@ const loginOptions: LoginOptionBtnProps[] = [
   {
     color: "warning",
     title: "Admin",
-    href: "/admin",
+    href: adminLoginUrl,
     img: {
       src: "admin-thumbnail.png",
       alt: "Login as Admin",
