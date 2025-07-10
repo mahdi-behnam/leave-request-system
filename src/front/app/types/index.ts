@@ -1,9 +1,9 @@
 export type LeaveRequest = {
   id: number;
   status: "Pending" | "Approved" | "Rejected";
-  startDate: string;
-  endDate: string;
-  createdAt: string;
+  start_date: string;
+  end_date: string;
+  created_at: string;
   reason: string | null;
 };
 
@@ -13,13 +13,13 @@ export enum UserRole {
 }
 
 export interface BaseUser {
-  id: string;
+  id: number;
+  date_joined: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  nationalId: string;
-  phoneNumber: string | null;
-  role: UserRole;
+  first_name: string;
+  last_name: string;
+  national_id: string;
+  phone_number: string;
 }
 
 export interface Supervisor extends BaseUser {
@@ -27,9 +27,9 @@ export interface Supervisor extends BaseUser {
 }
 
 export interface Employee extends BaseUser {
-  assignedSupervisor: Supervisor | null;
-  leaveRequestsLeft: number;
   role: UserRole.EMPLOYEE;
+  leave_requests_left: number;
+  assigned_supervisor: number | null;
 }
 
 export type User = Supervisor | Employee;

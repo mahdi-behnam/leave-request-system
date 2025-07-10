@@ -1,0 +1,1 @@
+export const DEFAULT_LEAVE_REQUESTS_COUNT = 30;

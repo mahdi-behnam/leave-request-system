@@ -7,6 +7,7 @@ import type { PickerValue } from "@mui/x-date-pickers/internals";
 import DateTimePicker from "~/components/common/DateTimePicker";
 import Collapse from "@mui/material/Collapse";
 import Alert from "@mui/material/Alert";
+import { createLeaveRequest } from "~/services/leaveRequests";
 
 class DatesRequiredError extends Error {
   constructor() {
@@ -15,10 +16,14 @@ class DatesRequiredError extends Error {
   }
 }
 
-const SubmitNewRequestForm = () => {
+interface Props {
+  refreshTableCallback: () => void;
+}
+
+const SubmitNewRequestForm: React.FC<Props> = ({ refreshTableCallback }) => {
   const [startDate, setStartDate] = useState<null | PickerValue>(null);
   const [endDate, setEndDate] = useState<null | PickerValue>(null);
-  const [reason, setReason] = useState<null | string>(null);
+  const [reason, setReason] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -34,18 +39,29 @@ const SubmitNewRequestForm = () => {
     setReason(newValue);
   };
 
+  const onSuccessfulSubmission = () => {
+    // Reset form fields
+    setStartDate(null);
+    setEndDate(null);
+    setReason("");
+    setError("");
+    // Refresh leave requests table
+    refreshTableCallback();
+  };
+
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
-      // TODO: connect to API
       if (!startDate || !endDate) throw new DatesRequiredError();
       setIsSubmitting(true);
-      await new Promise<void>((resolve) =>
-        setTimeout(() => {
-          resolve();
-          setError("");
-        }, 1000)
-      );
+      setError("");
+      const { data, error } = await createLeaveRequest({
+        reason,
+        end_date: endDate.toISOString(),
+        start_date: startDate.toISOString(),
+      });
+      if (error) setError(error);
+      else onSuccessfulSubmission();
     } catch (err) {
       console.error("Error submitting request: ", err);
       if (err instanceof DatesRequiredError) setError(err.message);

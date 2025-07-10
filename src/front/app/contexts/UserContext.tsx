@@ -26,7 +26,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     setUser(initialUser);
   }, []);
 
-  const setUserWithStorage = (newUser: User | null) => {
+  const setUserInStateAndStorage = (newUser: User | null) => {
     setUser(newUser);
     if (newUser)
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newUser));
@@ -34,7 +34,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser: setUserWithStorage }}>
+    <UserContext.Provider value={{ user, setUser: setUserInStateAndStorage }}>
       {children}
     </UserContext.Provider>
   );

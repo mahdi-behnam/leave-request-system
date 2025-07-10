@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import SubmitNewRequestForm from "./SubmitNewRequestForm";
 import type { LeaveRequest } from "~/types";
+import { fetchLeaveRequestsList } from "~/services/leaveRequests";
 
 const columns: GridColDef[] = [
   {
@@ -24,19 +25,19 @@ const columns: GridColDef[] = [
     headerAlign: "center",
   },
   {
-    field: "startDate",
+    field: "start_date",
     headerName: "Start Date",
     align: "center",
     headerAlign: "center",
   },
   {
-    field: "endDate",
+    field: "end_date",
     headerName: "End Date",
     align: "center",
     headerAlign: "center",
   },
   {
-    field: "createdAt",
+    field: "created_at",
     headerName: "Created At",
     align: "center",
     headerAlign: "center",
@@ -48,41 +49,6 @@ const columns: GridColDef[] = [
     sortable: false,
     filterable: false,
     flex: 1,
-  },
-];
-
-const dummyRows: LeaveRequest[] = [
-  {
-    id: 1,
-    status: "Pending",
-    startDate: "2023-10-01",
-    endDate: "2023-10-05",
-    createdAt: "2023-09-20",
-    reason: "Family emergency",
-  },
-  {
-    id: 2,
-    status: "Approved",
-    startDate: "2023-10-10",
-    endDate: "2023-10-12",
-    createdAt: "2023-09-22",
-    reason: "Medical leave long long long text here",
-  },
-  {
-    id: 3,
-    status: "Rejected",
-    startDate: "2023-10-15",
-    endDate: "2023-10-20",
-    createdAt: "2023-09-25",
-    reason: "Vacation",
-  },
-  {
-    id: 4,
-    status: "Pending",
-    startDate: "2023-11-01",
-    endDate: "2023-11-05",
-    createdAt: "2023-10-01",
-    reason: "Personal reasons",
   },
 ];
 
@@ -104,17 +70,13 @@ const LeaveRequestsTab = () => {
     }, 1000);
   };
 
-  useEffect(() => {
-    // Simulate fetching data from an API
-    const fetchData = async () => {
-      // TODO:  Replace this with actual API call
-      const fetchedRows = dummyRows; // Simulated data
-      setRows(fetchedRows);
-    };
+  const refreshTableRows = async () => {
+    const { data: fetchedRows, error } = await fetchLeaveRequestsList();
+    if (!error && fetchedRows) setRows(fetchedRows);
+  };
 
-    setTimeout(() => {
-      fetchData();
-    }, 1000);
+  useEffect(() => {
+    refreshTableRows();
   }, []);
 
   return (
@@ -174,7 +136,7 @@ const LeaveRequestsTab = () => {
           />
         </Paper>
         {/* Submit New Request */}
-        <SubmitNewRequestForm />
+        <SubmitNewRequestForm refreshTableCallback={refreshTableRows} />
       </Stack>
     </Box>
   );

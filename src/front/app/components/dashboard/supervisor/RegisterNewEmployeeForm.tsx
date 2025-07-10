@@ -5,20 +5,30 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import Alert from "@mui/material/Alert";
+import { signupEmployee } from "~/services/employees";
+import { DEFAULT_LEAVE_REQUESTS_COUNT } from "~/constants/common";
 
 type FieldName =
   | "firstName"
   | "lastName"
   | "email"
   | "nationalId"
-  | "phoneNumber";
+  | "phoneNumber"
+  | "leaveRequestsCount";
 
-const RegisterNewEmployeeForm = () => {
+interface Props {
+  refreshTableCallback: () => void;
+}
+
+const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [nationalId, setNationalId] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [leaveRequestsCount, setLeaveRequestsCount] = useState(
+    DEFAULT_LEAVE_REQUESTS_COUNT
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<FieldName, string>>({
     firstName: "",
@@ -26,6 +36,7 @@ const RegisterNewEmployeeForm = () => {
     email: "",
     nationalId: "",
     phoneNumber: "",
+    leaveRequestsCount: "",
   });
   const [registrationError, setRegistrationError] = useState("");
 
@@ -49,6 +60,9 @@ const RegisterNewEmployeeForm = () => {
       case "phoneNumber":
         setPhoneNumber(newValue);
         break;
+      case "leaveRequestsCount":
+        setLeaveRequestsCount(parseInt(newValue) || 0); // Default to 0 if NaN
+        break;
 
       default:
         break;
@@ -68,12 +82,37 @@ const RegisterNewEmployeeForm = () => {
       phoneNumber: phoneNumber.match(/^\d{11}$/)
         ? ""
         : "Phone number must be 11 digits",
+      leaveRequestsCount:
+        leaveRequestsCount >= 0
+          ? ""
+          : "Leave requests count must be a non-negative number",
     };
 
     setFieldErrors(newErrors);
 
     // Return true if no errors
     return Object.values(newErrors).every((error) => error === "");
+  };
+
+  const onSuccessfulSubmission = () => {
+    // Reset form fields
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setNationalId("");
+    setPhoneNumber("");
+    setLeaveRequestsCount(DEFAULT_LEAVE_REQUESTS_COUNT);
+    setFieldErrors({
+      firstName: "",
+      lastName: "",
+      email: "",
+      nationalId: "",
+      phoneNumber: "",
+      leaveRequestsCount: "",
+    });
+    setRegistrationError("");
+    // Refresh leave requests table
+    refreshTableCallback();
   };
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -83,15 +122,18 @@ const RegisterNewEmployeeForm = () => {
         return; // Stop submission if validation fails
       }
 
-      // TODO: connect to API
-
       setIsSubmitting(true);
-      await new Promise<void>((resolve) =>
-        setTimeout(() => {
-          resolve();
-          setRegistrationError("");
-        }, 1000)
-      );
+      setRegistrationError("");
+      const { data, error } = await signupEmployee({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        leave_requests_left: leaveRequestsCount,
+        national_id: nationalId,
+        phone_number: phoneNumber,
+      });
+      if (error) setRegistrationError(error);
+      else onSuccessfulSubmission();
     } catch (err) {
       console.error("Error submitting request: ", err);
       setRegistrationError("An unexpected error occurred. Please try again.");
@@ -157,6 +199,15 @@ const RegisterNewEmployeeForm = () => {
         value={phoneNumber}
         onChange={(e) => handleChange("phoneNumber", e.target.value)}
         helperText={fieldErrors.phoneNumber || ""}
+      />
+      <TextField
+        required
+        type="number"
+        error={!!fieldErrors.leaveRequestsCount}
+        label="Leave Requests Count"
+        value={leaveRequestsCount}
+        onChange={(e) => handleChange("leaveRequestsCount", e.target.value)}
+        helperText={fieldErrors.leaveRequestsCount || ""}
       />
 
       <Button variant="contained" type="submit" loading={isSubmitting}>

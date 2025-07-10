@@ -137,11 +137,16 @@ class UserProfileView(generics.RetrieveAPIView):
 
         if user.is_employee():
             serializer = EmployeeSerializer(subclass_instance)
+            role = "employee"
         elif user.is_supervisor():
             serializer = SupervisorSerializer(subclass_instance)
+            role = "supervisor"
         else:
             raise PermissionDenied(
                 "Only employees and supervisors can access this endpoint."
             )
 
-        return Response(serializer.data)
+        response_data = serializer.data
+        response_data["role"] = role
+
+        return Response(response_data)

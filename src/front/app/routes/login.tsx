@@ -17,6 +17,8 @@ import { useLoginRoleRedirect } from "~/hooks/useLoginRoleRedirect";
 import { useUser } from "~/contexts/UserContext";
 import { useNavigate } from "react-router";
 import { UserRole, type User } from "~/types";
+import { fetchAuthToken, fetchUserProfile } from "~/services/auth";
+import { setAccessTokenInCookie } from "~/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login - Leave Request Portal" }];
@@ -54,55 +56,33 @@ export default function Login() {
     e.preventDefault();
   };
 
-  const handleSubmitBtn = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitBtn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsLoggingIn(true);
-      // TODO: Implement login logic here
-      setTimeout(() => {
-        console.log("email: ", email);
-        console.log("password: ", password);
-        // const dummyResponse: User = {
-        // id: "1",
-        //   email: "mahdi@gmail.com",
-        //   firstName: "Mahdi",
-        //   lastName: "Behnam",
-        //   role: UserRole.EMPLOYEE,
-        //   nationalId: "1234567890",
-        //   phoneNumber: "09123456789",
-        //   assignedSupervisor: {
-        //     id: "2",
-        //     firstName: "Javad",
-        //     lastName: "Javadi",
-        //     email: "javad@gmail.com",
-        //     nationalId: "1363028731",
-        //     phoneNumber: "09123536363",
-        //     role: UserRole.SUPERVISOR,
-        //   },
-        //   leaveRequestsLeft: 30,
-        // };
-        const dummyResponse: User = {
-          id: "1",
-          email: "mahdi@gmail.com",
-          firstName: "Mahdi",
-          lastName: "Behnam",
-          role: UserRole.SUPERVISOR,
-          nationalId: "1234567890",
-          phoneNumber: "09123456789",
-        };
-        setUser(dummyResponse);
-        // Redirect to the appropriate dashboard based on the user's role
-        navigate(
-          currentPageRole === "employee"
-            ? "/employee-dashboard"
-            : currentPageRole === "supervisor"
-            ? "/supervisor-dashboard"
-            : "/"
-        );
-      }, 1000);
-    } catch (err) {
-      console.error("Login error: ", err);
-      setError("An error occurred while logging in. Please try again.");
+      const { data: authToken, error: authError } = await fetchAuthToken(
+        email,
+        password
+      );
+      if (authError) throw new Error(authError);
+      if (!authToken) throw new Error("Authentication token not received");
+      setAccessTokenInCookie(authToken);
+      const { data: user, error: profileError } = await fetchUserProfile();
+      if (profileError) throw new Error(profileError);
+      if (!user) throw new Error("User profile not found");
+      setUser(user);
+      navigate(
+        currentPageRole === "employee"
+          ? "/employee-dashboard"
+          : currentPageRole === "supervisor"
+          ? "/supervisor-dashboard"
+          : "/"
+      );
+    } catch (error) {
+      console.error("Login error: ", error);
+      setError(`An error occurred while logging in. ${error}`);
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 

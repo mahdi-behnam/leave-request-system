@@ -8,6 +8,10 @@ import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutli
 import { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import type { LeaveRequest } from "~/types";
+import {
+  fetchLeaveRequestsList,
+  updateLeaveRequestStatus,
+} from "~/services/leaveRequests";
 
 const columns: GridColDef[] = [
   {
@@ -24,19 +28,19 @@ const columns: GridColDef[] = [
     headerAlign: "center",
   },
   {
-    field: "startDate",
+    field: "start_date",
     headerName: "Start Date",
     align: "center",
     headerAlign: "center",
   },
   {
-    field: "endDate",
+    field: "end_date",
     headerName: "End Date",
     align: "center",
     headerAlign: "center",
   },
   {
-    field: "createdAt",
+    field: "created_at",
     headerName: "Created At",
     align: "center",
     headerAlign: "center",
@@ -51,81 +55,35 @@ const columns: GridColDef[] = [
   },
 ];
 
-const dummyRows: LeaveRequest[] = [
-  {
-    id: 1,
-    status: "Pending",
-    startDate: "2023-10-01",
-    endDate: "2023-10-05",
-    createdAt: "2023-09-20",
-    reason: "Family emergency",
-  },
-  {
-    id: 2,
-    status: "Approved",
-    startDate: "2023-10-10",
-    endDate: "2023-10-12",
-    createdAt: "2023-09-22",
-    reason: "Medical leave long long long text here",
-  },
-  {
-    id: 3,
-    status: "Rejected",
-    startDate: "2023-10-15",
-    endDate: "2023-10-20",
-    createdAt: "2023-09-25",
-    reason: "Vacation",
-  },
-  {
-    id: 4,
-    status: "Pending",
-    startDate: "2023-11-01",
-    endDate: "2023-11-05",
-    createdAt: "2023-10-01",
-    reason: "Personal reasons",
-  },
-];
-
 const paginationModel = { page: 0, pageSize: 20 };
 const pageSizeOptions = [5, 10, 20, 50, 100];
 
 const LeaveRequestsTab = () => {
   const [rows, setRows] = useState<null | LeaveRequest[]>(null);
-  const [deletingRowId, setDeletingRowId] = useState<null | number>(null);
+  const [rejectingRowId, setRejectingRowId] = useState<null | number>(null);
   const [approvingRowId, setApprovingRowId] = useState<null | number>(null);
 
-  const handleDeleteBtn = (id: number) => {
-    setDeletingRowId(id);
-    // TODO: connect to API
-    // Simulate an API call to delete the request
-    setTimeout(() => {
-      // Here you would typically update the state to remove the deleted request
-      console.log(`Request with ID ${id} deleted`);
-      setDeletingRowId(null);
-    }, 1000);
+  const handleRejectBtn = async (id: number) => {
+    setRejectingRowId(id);
+    const { data, error } = await updateLeaveRequestStatus(id, "Rejected");
+    if (error) console.error(`Failed to reject request with ID ${id}:`, error);
+    setRejectingRowId(null);
   };
 
-  const handleApproveBtn = (id: number) => {
+  const handleApproveBtn = async (id: number) => {
     setApprovingRowId(id);
-    // Simulate an API call to approve the request
-    setTimeout(() => {
-      // Here you would typically update the state to remove the approved request
-      console.log(`Request with ID ${id} approved`);
-      setApprovingRowId(null);
-    }, 1000);
+    const { data, error } = await updateLeaveRequestStatus(id, "Approved");
+    if (error) console.error(`Failed to approve request with ID ${id}:`, error);
+    setApprovingRowId(null);
   };
 
   useEffect(() => {
-    // Simulate fetching data from an API
     const fetchData = async () => {
-      // TODO:  Replace this with actual API call
-      const fetchedRows = dummyRows; // Simulated data
-      setRows(fetchedRows);
+      const { data: fetchedRows, error } = await fetchLeaveRequestsList();
+      if (!error && fetchedRows) setRows(fetchedRows);
     };
 
-    setTimeout(() => {
-      fetchData();
-    }, 1000);
+    fetchData();
   }, []);
 
   return (
@@ -170,8 +128,8 @@ const LeaveRequestsTab = () => {
                   <Stack direction="row" justifyContent="center" spacing={1}>
                     <IconButton
                       color="error"
-                      onClick={() => handleDeleteBtn(params.row.id)}
-                      loading={params.row.id === deletingRowId}
+                      onClick={() => handleRejectBtn(params.row.id)}
+                      loading={params.row.id === rejectingRowId}
                     >
                       <DeleteIcon />
                     </IconButton>

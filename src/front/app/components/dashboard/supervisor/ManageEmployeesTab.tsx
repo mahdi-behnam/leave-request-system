@@ -5,7 +5,8 @@ import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import RegisterNewEmployeeForm from "./RegisterNewEmployeeForm";
-import { UserRole, type Employee } from "~/types";
+import { type Employee } from "~/types";
+import { fetchEmployeesList } from "~/services/employees";
 
 const columns: GridColDef<Employee>[] = [
   {
@@ -22,7 +23,7 @@ const columns: GridColDef<Employee>[] = [
     minWidth: 150,
     align: "center",
     headerAlign: "center",
-    valueGetter: (_, row) => `${row.firstName} ${row.lastName}`,
+    valueGetter: (_, row) => `${row.first_name} ${row.last_name}`,
   },
   {
     field: "email",
@@ -33,7 +34,7 @@ const columns: GridColDef<Employee>[] = [
     headerAlign: "center",
   },
   {
-    field: "nationalId",
+    field: "national_id",
     headerName: "National ID",
     flex: 1,
     minWidth: 150,
@@ -41,7 +42,7 @@ const columns: GridColDef<Employee>[] = [
     headerAlign: "center",
   },
   {
-    field: "phoneNumber",
+    field: "phone_number",
     headerName: "Phone Number",
     flex: 1,
     minWidth: 150,
@@ -49,34 +50,12 @@ const columns: GridColDef<Employee>[] = [
     headerAlign: "center",
   },
   {
-    field: "leaveRequestsLeft",
+    field: "leave_requests_left",
     headerName: "Leave Requests Left",
     flex: 1,
     minWidth: 150,
     align: "center",
     headerAlign: "center",
-  },
-];
-
-const dummyRows: Employee[] = [
-  {
-    id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@gmail.com",
-    nationalId: "123456789",
-    phoneNumber: "09123456789",
-    leaveRequestsLeft: 30,
-    role: UserRole.EMPLOYEE,
-    assignedSupervisor: {
-      id: "2",
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane.smith@gmail.com",
-      nationalId: "987654321",
-      phoneNumber: "09876543210",
-      role: UserRole.SUPERVISOR,
-    },
   },
 ];
 
@@ -86,17 +65,13 @@ const pageSizeOptions = [5, 10, 20, 50, 100];
 const ManageEmployeesTab = () => {
   const [rows, setRows] = useState<null | Employee[]>(null);
 
-  useEffect(() => {
-    // Simulate fetching data from an API
-    const fetchData = async () => {
-      // TODO:  Replace this with actual API call
-      const fetchedRows = dummyRows; // Simulated data
-      setRows(fetchedRows);
-    };
+  const refreshTableRows = async () => {
+    const { data: fetchedRows, error } = await fetchEmployeesList();
+    if (!error && fetchedRows) setRows(fetchedRows);
+  };
 
-    setTimeout(() => {
-      fetchData();
-    }, 1000);
+  useEffect(() => {
+    refreshTableRows();
   }, []);
 
   return (
@@ -137,7 +112,7 @@ const ManageEmployeesTab = () => {
           />
         </Paper>
         {/* Register New Employee */}
-        <RegisterNewEmployeeForm />
+        <RegisterNewEmployeeForm refreshTableCallback={refreshTableRows} />
       </Stack>
     </Box>
   );

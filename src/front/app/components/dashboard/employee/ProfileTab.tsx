@@ -9,12 +9,23 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
-import { UserRole, type Supervisor } from "~/types";
+import { UserRole } from "~/types";
 import { useUser } from "~/contexts/UserContext";
+import { useEffect } from "react";
+import { fetchUserProfile } from "~/services/auth";
 
 const ProfileTab = () => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   if (!user || user.role !== UserRole.EMPLOYEE) return null;
+
+  useEffect(() => {
+    const updateUserProfile = async () => {
+      const { data, error } = await fetchUserProfile();
+      if (!error && data) setUser(data);
+    };
+
+    updateUserProfile();
+  }, []);
 
   return (
     <Box className="profile-tab-content">
@@ -24,13 +35,13 @@ const ProfileTab = () => {
       </Typography>
       <Paper sx={{ p: 2, mt: 2 }}>
         <Stack direction="row" alignItems="center">
-          <Avatar>{getAvatarShortName(user.firstName, user.lastName)}</Avatar>
+          <Avatar>{getAvatarShortName(user.first_name, user.last_name)}</Avatar>
           <Typography ml={2}>
             <Typography variant="h6" component="span">
-              {user.firstName}{" "}
+              {user.first_name}{" "}
             </Typography>
             <Typography variant="h6" component="span">
-              {user.lastName}
+              {user.last_name}
             </Typography>
           </Typography>
         </Stack>
@@ -49,11 +60,11 @@ const ProfileTab = () => {
             </TableRow>
             <TableRow>
               <TableCell>National ID</TableCell>
-              <TableCell>{user.nationalId}</TableCell>
+              <TableCell>{user.national_id}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Phone Number</TableCell>
-              <TableCell>{user.phoneNumber}</TableCell>
+              <TableCell>{user.phone_number}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Role</TableCell>
@@ -61,59 +72,18 @@ const ProfileTab = () => {
             </TableRow>
             <TableRow>
               <TableCell>Leave Requests Left</TableCell>
-              <TableCell>{user.leaveRequestsLeft}</TableCell>
+              <TableCell>{user.leave_requests_left}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Assigned Supervisor</TableCell>
+              <TableCell>Assigned Supervisor ID</TableCell>
               <TableCell>
-                {user.assignedSupervisor ? (
-                  <AssignedSupervisorTable data={user.assignedSupervisor} />
-                ) : (
-                  "N/A"
-                )}
+                {user.assigned_supervisor ? user.assigned_supervisor : "N/A"}
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Paper>
     </Box>
-  );
-};
-
-const AssignedSupervisorTable = ({ data }: { data: Supervisor }) => {
-  const { firstName, lastName, email, nationalId, phoneNumber } = data;
-
-  return (
-    <Table
-      sx={{
-        background: (theme) => theme.palette.grey[100],
-        border: "1px solid",
-        borderColor: (theme) => theme.palette.grey[400],
-      }}
-    >
-      <TableBody>
-        <TableRow>
-          <TableCell>First Name</TableCell>
-          <TableCell>{firstName}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Last Name</TableCell>
-          <TableCell>{lastName}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Email</TableCell>
-          <TableCell>{email}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>National ID</TableCell>
-          <TableCell>{nationalId}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Phone Number</TableCell>
-          <TableCell>{phoneNumber}</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
   );
 };
 
