@@ -42,8 +42,9 @@ class EmployeeListView(generics.ListAPIView):
         user = self.request.user
         if user.is_superuser:
             return Employee.objects.all()
-        elif user.is_supervisor() == "Supervisor":
-            return Employee.objects.filter(assigned_supervisor=user)
+        elif user.is_supervisor():
+            supervisor = user.get_subclass_instance()
+            return Employee.objects.filter(assigned_supervisor=supervisor)
         return Employee.objects.none()
 
 
