@@ -23,6 +23,8 @@ export async function fetchAuthToken(
       .catch((error) => {
         if (error.response.data.detail)
           throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
         else throw new Error(error);
       });
 
@@ -53,6 +55,8 @@ export async function fetchUserProfile(): Promise<{
       .catch((error) => {
         if (error.response.data.detail)
           throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
         else throw new Error(error);
       });
     return { data: response.data as Employee | Supervisor };

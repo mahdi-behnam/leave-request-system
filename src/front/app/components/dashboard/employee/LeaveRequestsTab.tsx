@@ -8,7 +8,10 @@ import { useEffect, useState } from "react";
 import Stack from "@mui/material/Stack";
 import SubmitNewRequestForm from "./SubmitNewRequestForm";
 import type { LeaveRequest } from "~/types";
-import { fetchLeaveRequestsList } from "~/services/leaveRequests";
+import {
+  deleteLeaveRequest,
+  fetchLeaveRequestsList,
+} from "~/services/leaveRequests";
 
 const columns: GridColDef[] = [
   {
@@ -59,15 +62,12 @@ const LeaveRequestsTab = () => {
   const [rows, setRows] = useState<null | LeaveRequest[]>(null);
   const [deletingRowId, setDeletingRowId] = useState<null | number>(null);
 
-  const handleDeleteBtn = (id: number) => {
+  const handleDeleteBtn = async (id: number) => {
     setDeletingRowId(id);
-    // TODO: connect to API
-    // Simulate an API call to delete the request
-    setTimeout(() => {
-      // Here you would typically update the state to remove the deleted request
-      console.log(`Request with ID ${id} deleted`);
-      setDeletingRowId(null);
-    }, 1000);
+    const { error } = await deleteLeaveRequest(id);
+    if (error) console.error("Error deleting leave request:", error);
+    setDeletingRowId(null);
+    await refreshTableRows();
   };
 
   const refreshTableRows = async () => {
@@ -120,6 +120,7 @@ const LeaveRequestsTab = () => {
                 renderCell: (params) => (
                   <IconButton
                     color="error"
+                    disabled={params.row.status !== "pending"}
                     onClick={() => handleDeleteBtn(params.row.id)}
                     loading={params.row.id === deletingRowId}
                   >

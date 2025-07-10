@@ -16,6 +16,13 @@ class DatesRequiredError extends Error {
   }
 }
 
+class InvalidDateRangeError extends Error {
+  constructor() {
+    super("Start date must be before end date.");
+    this.name = "InvalidDateRangeError";
+  }
+}
+
 interface Props {
   refreshTableCallback: () => void;
 }
@@ -53,6 +60,7 @@ const SubmitNewRequestForm: React.FC<Props> = ({ refreshTableCallback }) => {
     e.preventDefault();
     try {
       if (!startDate || !endDate) throw new DatesRequiredError();
+      if (startDate >= endDate) throw new InvalidDateRangeError();
       setIsSubmitting(true);
       setError("");
       const { data, error } = await createLeaveRequest({
@@ -65,7 +73,7 @@ const SubmitNewRequestForm: React.FC<Props> = ({ refreshTableCallback }) => {
     } catch (err) {
       console.error("Error submitting request: ", err);
       if (err instanceof DatesRequiredError) setError(err.message);
-      else setError("An unexpected error occurred. Please try again.");
+      else setError("Error submitting request: " + err);
     } finally {
       setIsSubmitting(false);
     }

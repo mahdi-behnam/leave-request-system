@@ -86,6 +86,15 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ["id", "employee", "status"]
 
+    def validate(self, data):
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
+        if start_date and end_date and start_date >= end_date:
+            raise serializers.ValidationError(
+                {"start_date": "Start date must be before end date."}
+            )
+        return data
+
 
 class LeaveRequestStatusUpdateSerializer(serializers.ModelSerializer):
 

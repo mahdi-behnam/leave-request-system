@@ -4,6 +4,7 @@ import {
   leaveRequestListUrl,
   leaveRequestCreateUrl,
   buildLeaveRequestStatusUpdateUrl,
+  buildLeaveRequestDeleteUrl,
 } from "~/constants/linksConfig";
 import type { LeaveRequest } from "~/types";
 import { getAccessTokenFromCookie } from "~/utils";
@@ -23,6 +24,8 @@ export async function fetchLeaveRequestsList(): Promise<{
       .catch((error) => {
         if (error.response.data.detail)
           throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
         else throw new Error(error);
       });
     return { data: response.data as LeaveRequest[] };
@@ -51,6 +54,8 @@ export async function createLeaveRequest(
       .catch((error) => {
         if (error.response.data.detail)
           throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
         else throw new Error(error);
       });
     return { data: response.data as LeaveRequest };
@@ -95,6 +100,37 @@ export async function updateLeaveRequestStatus(
         error.response.data
       );
     } else console.error("Failed to update leave request status:", error);
+    return { error: error + "" };
+  }
+}
+
+export async function deleteLeaveRequest(
+  leaveRequestId: number
+): Promise<{ error?: string }> {
+  try {
+    const accessToken = getAccessTokenFromCookie();
+    if (!accessToken) throw new MissingAccessTokenError();
+    const url = buildLeaveRequestDeleteUrl(leaveRequestId);
+    const response = await apiClient
+      .delete(url, {
+        headers: { Authorization: `Token ${accessToken}` },
+      })
+      .catch((error) => {
+        if (error.response.data.detail)
+          throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
+        else throw new Error(error);
+      });
+    return { error: undefined };
+  } catch (error) {
+    if (error instanceof AxiosError && error.response) {
+      console.error(
+        "Failed to delete leave request:",
+        error.response.status,
+        error.response.data
+      );
+    } else console.error("Failed to delete leave request:", error);
     return { error: error + "" };
   }
 }

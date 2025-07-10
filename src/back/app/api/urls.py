@@ -9,6 +9,7 @@ from .views import (
     LeaveRequestListView,
     LeaveRequestCreateView,
     LeaveRequestStatusUpdateView,
+    LeaveRequestDeleteView,
     UserProfileView,
 )
 
@@ -33,6 +34,11 @@ urlpatterns = [
         "leave-requests/<int:pk>/status/",
         LeaveRequestStatusUpdateView.as_view(),
         name="leave-request-status-update",
+    ),
+    path(
+        "leave-requests/<int:pk>/delete/",
+        LeaveRequestDeleteView.as_view(),
+        name="leave-request-delete",
     ),
     path("profile/", UserProfileView.as_view(), name="user-profile"),
 ]

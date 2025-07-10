@@ -19,4 +19,7 @@ export const leaveRequestCreateUrl = `${BASE_API_URL}/leave-requests/create/`;
 export const buildLeaveRequestStatusUpdateUrl = (id: number) =>
   `${BASE_API_URL}/leave-requests/${id}/status/`;
 
+export const buildLeaveRequestDeleteUrl = (id: number) =>
+  `${BASE_API_URL}/leave-requests/${id}/delete/`;
+
 export const userProfileUrl = `${BASE_API_URL}/profile/`;

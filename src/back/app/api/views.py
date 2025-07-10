@@ -56,6 +56,24 @@ class LeaveRequestCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         if self.request.user.is_employee():
             employee = self.request.user.get_subclass_instance()
+            start_date = serializer.validated_data.get("start_date")
+            end_date = serializer.validated_data.get("end_date")
+
+            # Check if the employee has remaining leave requests
+            if employee.leave_requests_left <= 0:
+                raise PermissionDenied("You have run out of available leave requests.")
+
+            # Check for overlapping leave requests
+            overlapping_requests = LeaveRequest.objects.filter(
+                employee=employee,
+                start_date__lte=end_date,
+                end_date__gte=start_date,
+            ).exclude(status=LeaveRequest.LeaveStatus.REJECTED)
+            if overlapping_requests.exists():
+                raise PermissionDenied(
+                    "You already have a leave request that overlaps with the requested date range."
+                )
+
             serializer.save(employee=employee)
         else:
             serializer.save()
@@ -81,6 +99,31 @@ class LeaveRequestListView(generics.ListAPIView):
             return LeaveRequest.objects.filter(employee=employee)
 
         return LeaveRequest.objects.none()
+
+
+class LeaveRequestDeleteView(generics.DestroyAPIView):
+    queryset = LeaveRequest.objects.all()
+    serializer_class = LeaveRequestSerializer
+    permission_classes = [IsAuthenticated, IsSuperuserOrEmployee]
+
+    def get_object(self):
+        leave_request = super().get_object()
+        user = self.request.user
+
+        if user.is_superuser:
+            return leave_request
+
+        # If employee, ensure the leave request belongs to them
+        if user.is_employee():
+            employee = user.get_subclass_instance()
+            if leave_request.status != LeaveRequest.LeaveStatus.PENDING:
+                raise PermissionDenied("Only pending leave requests can be deleted.")
+            if leave_request.employee == employee:
+                return leave_request
+
+        raise PermissionDenied(
+            "You don't have permission to delete this leave request."
+        )
 
 
 class LeaveRequestStatusUpdateView(generics.UpdateAPIView):
@@ -116,6 +159,11 @@ class LeaveRequestStatusUpdateView(generics.UpdateAPIView):
             )
 
         if new_status == LeaveRequest.LeaveStatus.APPROVED:
+            if leave_request.employee.leave_requests_left <= 0:
+                return Response(
+                    {"detail": "Employee has no remaining leave requests."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             leave_request.approve_leave()
         elif new_status == LeaveRequest.LeaveStatus.REJECTED:
             leave_request.reject_leave()
