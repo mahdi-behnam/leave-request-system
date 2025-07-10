@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Supervisor, Employee, LeaveRequest
 from .serializers import (
     EmployeeSerializer,
+    EmployeeSignupSerializer,
     SupervisorSignupSerializer,
 )
 from .permissions import IsSuperuserOrSupervisor
@@ -15,14 +16,15 @@ class SupervisorSignupView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-class EmployeeCreateView(generics.CreateAPIView):
+class EmployeeSignupView(generics.CreateAPIView):
     queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
+    serializer_class = EmployeeSignupSerializer
     permission_classes = [IsAuthenticated, IsSuperuserOrSupervisor]
 
     def perform_create(self, serializer):
-        if self.request.user.is_superuser():
-            serializer.save(assigned_supervisor=self.request.user)
+        if self.request.user.is_supervisor():
+            supervisor = self.request.user.get_subclass_instance()
+            serializer.save(assigned_supervisor=supervisor)
         else:
             serializer.save()
 

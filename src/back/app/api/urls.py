@@ -3,7 +3,7 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import (
-    EmployeeCreateView,
+    EmployeeSignupView,
     EmployeeListView,
     SupervisorSignupView,
 )
@@ -18,5 +18,5 @@ urlpatterns = [
         "supervisors/signup/", SupervisorSignupView.as_view(), name="supervisor-signup"
     ),
     path("employees/", EmployeeListView.as_view(), name="employee-list"),
-    path("employees/signup/", EmployeeCreateView.as_view(), name="employee-signup"),
+    path("employees/signup/", EmployeeSignupView.as_view(), name="employee-signup"),
 ]

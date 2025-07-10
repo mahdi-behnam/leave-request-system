@@ -56,6 +56,30 @@ class EmployeeSerializer(serializers.ModelSerializer):
         ]
 
 
+class EmployeeSignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    class Meta:
+        model = Employee
+        fields = [
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "national_id",
+            "phone_number",
+            "leave_requests_left",
+        ]
+        extra_kwargs = {"leave_requests_left": {"default": 30}}
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        employee = Employee(**validated_data)
+        employee.set_password(password)
+        employee.save()
+        return employee
+
+
 class LeaveRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveRequest

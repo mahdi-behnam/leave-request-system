@@ -24,11 +24,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = "Users"
         ordering = ["date_joined"]
 
+    def get_subclass_instance(self):
+        try:
+            return self.employee
+        except Employee.DoesNotExist:
+            try:
+                return self.supervisor
+            except Supervisor.DoesNotExist:
+                return self
+
     def is_supervisor(self):
-        return hasattr(self, "supervisor")
+        return isinstance(self.get_subclass_instance(), Supervisor)
 
     def is_employee(self):
-        return hasattr(self, "employee")
+        return isinstance(self.get_subclass_instance(), Employee)
 
     def is_employee_or_supervisor(self):
         return self.is_employee() or self.is_supervisor()
