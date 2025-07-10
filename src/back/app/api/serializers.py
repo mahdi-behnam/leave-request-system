@@ -83,5 +83,5 @@ class EmployeeSignupSerializer(serializers.ModelSerializer):
 class LeaveRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveRequest
-        # fields = ["id", "employee", "start_date", "end_date", "reason", "status"]
         fields = "__all__"
+        read_only_fields = ["id", "employee", "status"]

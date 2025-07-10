@@ -6,6 +6,7 @@ from .views import (
     EmployeeSignupView,
     EmployeeListView,
     SupervisorSignupView,
+    LeaveRequestCreateView,
 )
 
 router = routers.DefaultRouter()
@@ -19,4 +20,9 @@ urlpatterns = [
     ),
     path("employees/", EmployeeListView.as_view(), name="employee-list"),
     path("employees/signup/", EmployeeSignupView.as_view(), name="employee-signup"),
+    path(
+        "leave-requests/create",
+        LeaveRequestCreateView.as_view(),
+        name="leave-request-create",
+    ),
 ]

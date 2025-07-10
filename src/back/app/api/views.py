@@ -5,9 +5,10 @@ from .models import Supervisor, Employee, LeaveRequest
 from .serializers import (
     EmployeeSerializer,
     EmployeeSignupSerializer,
+    LeaveRequestSerializer,
     SupervisorSignupSerializer,
 )
-from .permissions import IsSuperuserOrSupervisor
+from .permissions import IsSuperuserOrEmployee, IsSuperuserOrSupervisor
 
 
 class SupervisorSignupView(generics.CreateAPIView):
@@ -40,3 +41,16 @@ class EmployeeListView(generics.ListAPIView):
         elif user.is_supervisor() == "Supervisor":
             return Employee.objects.filter(assigned_supervisor=user)
         return Employee.objects.none()
+
+
+class LeaveRequestCreateView(generics.CreateAPIView):
+    queryset = LeaveRequest.objects.all()
+    serializer_class = LeaveRequestSerializer
+    permission_classes = [IsAuthenticated, IsSuperuserOrEmployee]
+
+    def perform_create(self, serializer):
+        if self.request.user.is_employee():
+            employee = self.request.user.get_subclass_instance()
+            serializer.save(employee=employee)
+        else:
+            serializer.save()
