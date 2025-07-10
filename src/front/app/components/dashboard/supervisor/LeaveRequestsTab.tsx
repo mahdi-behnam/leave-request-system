@@ -46,6 +46,12 @@ const columns: GridColDef[] = [
     headerAlign: "center",
   },
   {
+    field: "employee",
+    headerName: "Employee ID",
+    align: "center",
+    headerAlign: "center",
+  },
+  {
     field: "reason",
     headerName: "Reason",
     headerAlign: "center",
@@ -65,25 +71,27 @@ const LeaveRequestsTab = () => {
 
   const handleRejectBtn = async (id: number) => {
     setRejectingRowId(id);
-    const { data, error } = await updateLeaveRequestStatus(id, "Rejected");
+    const { data, error } = await updateLeaveRequestStatus(id, "rejected");
     if (error) console.error(`Failed to reject request with ID ${id}:`, error);
+    await refreshTableRows();
     setRejectingRowId(null);
   };
 
   const handleApproveBtn = async (id: number) => {
     setApprovingRowId(id);
-    const { data, error } = await updateLeaveRequestStatus(id, "Approved");
+    const { data, error } = await updateLeaveRequestStatus(id, "approved");
     if (error) console.error(`Failed to approve request with ID ${id}:`, error);
+    await refreshTableRows();
     setApprovingRowId(null);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: fetchedRows, error } = await fetchLeaveRequestsList();
-      if (!error && fetchedRows) setRows(fetchedRows);
-    };
+  const refreshTableRows = async () => {
+    const { data: fetchedRows, error } = await fetchLeaveRequestsList();
+    if (!error && fetchedRows) setRows(fetchedRows);
+  };
 
-    fetchData();
+  useEffect(() => {
+    refreshTableRows();
   }, []);
 
   return (
@@ -128,6 +136,7 @@ const LeaveRequestsTab = () => {
                   <Stack direction="row" justifyContent="center" spacing={1}>
                     <IconButton
                       color="error"
+                      disabled={params.row.status !== "pending"}
                       onClick={() => handleRejectBtn(params.row.id)}
                       loading={params.row.id === rejectingRowId}
                     >
@@ -135,6 +144,7 @@ const LeaveRequestsTab = () => {
                     </IconButton>
                     <IconButton
                       color="success"
+                      disabled={params.row.status !== "pending"}
                       onClick={() => handleApproveBtn(params.row.id)}
                       loading={params.row.id === approvingRowId}
                     >

@@ -30,7 +30,7 @@ export async function fetchEmployeesList(): Promise<{
         error.response.data
       );
     } else console.error("Failed to fetch employees list:", error);
-    return { data: [], error: error as string };
+    return { data: [], error: error + "" };
   }
 }
 
@@ -38,7 +38,7 @@ export async function signupEmployee(
   employee: Omit<
     Employee,
     "id" | "date_joined" | "assigned_supervisor" | "role"
-  >
+  > & { password: string }
 ): Promise<{ data?: Employee; error?: string }> {
   try {
     const accessToken = getAccessTokenFromCookie();
@@ -50,6 +50,8 @@ export async function signupEmployee(
       .catch((error) => {
         if (error.response.data.detail)
           throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
         else throw new Error(error);
       });
     return { data: response.data as Employee };
@@ -61,6 +63,6 @@ export async function signupEmployee(
         error.response.data
       );
     } else console.error("Failed to signup employee:", error);
-    return { error: error as string };
+    return { error: error + "" };
   }
 }

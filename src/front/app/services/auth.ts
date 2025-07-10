@@ -35,7 +35,7 @@ export async function fetchAuthToken(
         error.response.data
       );
     } else console.error("Failed to login:", error);
-    return { error: error as string };
+    return { error: error + "" };
   }
 }
 
@@ -64,6 +64,6 @@ export async function fetchUserProfile(): Promise<{
         error.response.data
       );
     } else console.error("Failed to fetch user profile:", error);
-    return { error: error as string };
+    return { error: error + "" };
   }
 }

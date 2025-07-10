@@ -1,6 +1,6 @@
 export type LeaveRequest = {
   id: number;
-  status: "Pending" | "Approved" | "Rejected";
+  status: "pending" | "approved" | "rejected";
   start_date: string;
   end_date: string;
   created_at: string;

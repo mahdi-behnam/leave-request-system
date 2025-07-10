@@ -10,6 +10,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Button from "@mui/material/Button";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import { useUser } from "~/contexts/UserContext";
+import { useNavigate } from "react-router";
+import { removeAccessTokenCookie } from "~/utils";
 
 const drawerWidth = 240;
 
@@ -26,8 +31,18 @@ const CustomDrawer: React.FC<Props> = ({
   setActiveTabIndex,
   children,
 }) => {
+  const { setUser } = useUser();
+  const navigate = useNavigate();
+
   const handleTabClick = (tabIndex: number) => {
     setActiveTabIndex(tabIndex);
+  };
+
+  const handleLogoutBtn = () => {
+    // Clear user data and redirect to login page
+    setUser(null);
+    removeAccessTokenCookie();
+    navigate("/login");
   };
 
   return (
@@ -54,7 +69,18 @@ const CustomDrawer: React.FC<Props> = ({
         variant="permanent"
         anchor="left"
       >
-        <Toolbar />
+        <Toolbar>
+          <Button
+            id="logout-button"
+            variant="contained"
+            color="error"
+            disableElevation
+            startIcon={<LogoutOutlinedIcon />}
+            onClick={handleLogoutBtn}
+          >
+            Logout
+          </Button>
+        </Toolbar>
         <Divider />
         <List>
           {tabs.map((t, idx) => (

@@ -34,7 +34,7 @@ export async function fetchLeaveRequestsList(): Promise<{
         error.response.data
       );
     } else console.error("Failed to fetch leave requests list:", error);
-    return { data: [], error: error as string };
+    return { data: [], error: error + "" };
   }
 }
 
@@ -62,7 +62,7 @@ export async function createLeaveRequest(
         error.response.data
       );
     } else console.error("Failed to create leave request:", error);
-    return { error: error as string };
+    return { error: error + "" };
   }
 }
 
@@ -82,6 +82,8 @@ export async function updateLeaveRequestStatus(
       .catch((error) => {
         if (error.response.data.detail)
           throw new Error(error.response.data.detail);
+        else if (error.response.data)
+          throw new Error(JSON.stringify(error.response.data));
         else throw new Error(error);
       });
     return { data: response.data as LeaveRequest };
@@ -93,6 +95,6 @@ export async function updateLeaveRequestStatus(
         error.response.data
       );
     } else console.error("Failed to update leave request status:", error);
-    return { error: error as string };
+    return { error: error + "" };
   }
 }

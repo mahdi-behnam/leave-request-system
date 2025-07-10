@@ -14,6 +14,7 @@ type FieldName =
   | "email"
   | "nationalId"
   | "phoneNumber"
+  | "password"
   | "leaveRequestsCount";
 
 interface Props {
@@ -26,6 +27,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
   const [email, setEmail] = useState("");
   const [nationalId, setNationalId] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
   const [leaveRequestsCount, setLeaveRequestsCount] = useState(
     DEFAULT_LEAVE_REQUESTS_COUNT
   );
@@ -36,6 +38,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
     email: "",
     nationalId: "",
     phoneNumber: "",
+    password: "",
     leaveRequestsCount: "",
   });
   const [registrationError, setRegistrationError] = useState("");
@@ -60,6 +63,9 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
       case "phoneNumber":
         setPhoneNumber(newValue);
         break;
+      case "password":
+        setPassword(newValue);
+        break;
       case "leaveRequestsCount":
         setLeaveRequestsCount(parseInt(newValue) || 0); // Default to 0 if NaN
         break;
@@ -82,6 +88,8 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
       phoneNumber: phoneNumber.match(/^\d{11}$/)
         ? ""
         : "Phone number must be 11 digits",
+      password:
+        password.length >= 8 ? "" : "Password must be at least 8 characters",
       leaveRequestsCount:
         leaveRequestsCount >= 0
           ? ""
@@ -101,6 +109,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
     setEmail("");
     setNationalId("");
     setPhoneNumber("");
+    setPassword("");
     setLeaveRequestsCount(DEFAULT_LEAVE_REQUESTS_COUNT);
     setFieldErrors({
       firstName: "",
@@ -108,6 +117,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
       email: "",
       nationalId: "",
       phoneNumber: "",
+      password: "",
       leaveRequestsCount: "",
     });
     setRegistrationError("");
@@ -128,6 +138,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         email,
         first_name: firstName,
         last_name: lastName,
+        password,
         leave_requests_left: leaveRequestsCount,
         national_id: nationalId,
         phone_number: phoneNumber,
@@ -199,6 +210,15 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         value={phoneNumber}
         onChange={(e) => handleChange("phoneNumber", e.target.value)}
         helperText={fieldErrors.phoneNumber || ""}
+      />
+      <TextField
+        required
+        type="password"
+        error={!!fieldErrors.password}
+        label="Password"
+        value={password}
+        onChange={(e) => handleChange("password", e.target.value)}
+        helperText={fieldErrors.password || ""}
       />
       <TextField
         required
