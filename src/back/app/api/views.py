@@ -8,6 +8,7 @@ from .serializers import (
     EmployeeSerializer,
     EmployeeSignupSerializer,
     LeaveRequestSerializer,
+    SupervisorSerializer,
     SupervisorSignupSerializer,
     LeaveRequestStatusUpdateSerializer,
 )
@@ -123,4 +124,23 @@ class LeaveRequestStatusUpdateView(generics.UpdateAPIView):
             )
 
         serializer = self.get_serializer(leave_request)
+        return Response(serializer.data)
+
+
+class UserProfileView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        subclass_instance = user.get_subclass_instance()
+
+        if user.is_employee():
+            serializer = EmployeeSerializer(subclass_instance)
+        elif user.is_supervisor():
+            serializer = SupervisorSerializer(subclass_instance)
+        else:
+            raise PermissionDenied(
+                "Only employees and supervisors can access this endpoint."
+            )
+
         return Response(serializer.data)

@@ -9,6 +9,7 @@ from .views import (
     LeaveRequestListView,
     LeaveRequestCreateView,
     LeaveRequestStatusUpdateView,
+    UserProfileView,
 )
 
 router = routers.DefaultRouter()
@@ -33,4 +34,5 @@ urlpatterns = [
         LeaveRequestStatusUpdateView.as_view(),
         name="leave-request-status-update",
     ),
+    path("profile/", UserProfileView.as_view(), name="user-profile"),
 ]
