@@ -1,11 +1,18 @@
 from rest_framework import permissions, viewsets, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Supervisor, Employee, LeaveRequest
 from .serializers import (
     EmployeeSerializer,
+    SupervisorSignupSerializer,
 )
 from .permissions import IsSuperuserOrSupervisor
+
+
+class SupervisorSignupView(generics.CreateAPIView):
+    queryset = Supervisor.objects.all()
+    serializer_class = SupervisorSignupSerializer
+    permission_classes = [AllowAny]
 
 
 class EmployeeCreateView(generics.CreateAPIView):

@@ -17,6 +17,28 @@ class SupervisorSerializer(serializers.ModelSerializer):
         ]
 
 
+class SupervisorSignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    class Meta:
+        model = Supervisor
+        fields = [
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "national_id",
+            "phone_number",
+        ]
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        supervisor = Supervisor(**validated_data)
+        supervisor.set_password(password)
+        supervisor.save()
+        return supervisor
+
+
 class EmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:

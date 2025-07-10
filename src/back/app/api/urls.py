@@ -5,6 +5,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from .views import (
     EmployeeCreateView,
     EmployeeListView,
+    SupervisorSignupView,
 )
 
 router = routers.DefaultRouter()
@@ -13,6 +14,9 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path("", include(router.urls)),
     path("auth/", obtain_auth_token, name="api-token-auth"),
+    path(
+        "supervisors/signup/", SupervisorSignupView.as_view(), name="supervisor-signup"
+    ),
     path("employees/", EmployeeListView.as_view(), name="employee-list"),
     path("employees/signup/", EmployeeCreateView.as_view(), name="employee-signup"),
 ]

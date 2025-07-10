@@ -25,10 +25,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ordering = ["date_joined"]
 
     def is_supervisor(self):
-        return isinstance(self, Supervisor)
+        return hasattr(self, "supervisor")
 
     def is_employee(self):
-        return isinstance(self, Employee)
+        return hasattr(self, "employee")
 
     def is_employee_or_supervisor(self):
         return self.is_employee() or self.is_supervisor()
