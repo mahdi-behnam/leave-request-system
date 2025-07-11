@@ -85,6 +85,8 @@ AUTH_USER_MODEL = "api.CustomUser"
 
 ROOT_URLCONF = "app.urls"
 
+SWAGGER_USE_COMPAT_RENDERERS = False
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
