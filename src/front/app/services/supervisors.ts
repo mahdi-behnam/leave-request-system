@@ -1,8 +1,5 @@
-import { AxiosError } from "axios";
-import { MissingAccessTokenError } from "~/constants/errors";
 import { supervisorSignupUrl } from "~/constants/linksConfig";
 import type { Supervisor } from "~/types";
-import { getAccessTokenFromCookie } from "~/utils";
 import apiClient, { parseApiError } from "~/utils/apiClient";
 
 export async function signupSupervisor(
@@ -18,13 +15,7 @@ export async function signupSupervisor(
       });
     return { data: response.data as Supervisor };
   } catch (error) {
-    if (error instanceof AxiosError && error.response) {
-      console.error(
-        "Failed to signup supervisor:",
-        error.response.status,
-        error.response.data
-      );
-    } else console.error("Failed to signup supervisor:", error);
+    console.error("Failed to signup supervisor:", error);
     return { error: error + "" };
   }
 }
