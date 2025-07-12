@@ -1,6 +1,6 @@
 const BACKEND_HOST = "http://127.0.0.1:8000";
 
-const BASE_API_URL = `${BACKEND_HOST}/api`;
+export const BASE_API_URL = `${BACKEND_HOST}/api`;
 
 export const adminLoginUrl = `${BACKEND_HOST}/admin/`;
 
