@@ -2,7 +2,15 @@ import { signupSupervisor } from "~/services/supervisors";
 import apiClient from "~/utils/apiClient";
 
 jest.mock("~/utils/apiClient", () => ({
-  post: jest.fn(),
+  __esModule: true,
+  default: {
+    post: jest.fn(),
+  },
+  parseApiError: jest.fn((e) => {
+    if (typeof e === "string") return e;
+    if (e instanceof Error) return e.message;
+    return JSON.stringify(e);
+  }),
 }));
 
 const mockedApiClient = apiClient as jest.Mocked<typeof apiClient>;

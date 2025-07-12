@@ -3,7 +3,7 @@ import { MissingAccessTokenError } from "~/constants/errors";
 import { supervisorSignupUrl } from "~/constants/linksConfig";
 import type { Supervisor } from "~/types";
 import { getAccessTokenFromCookie } from "~/utils";
-import apiClient from "~/utils/apiClient";
+import apiClient, { parseApiError } from "~/utils/apiClient";
 
 export async function signupSupervisor(
   supervisor: Omit<Supervisor, "id" | "date_joined" | "role"> & {
@@ -14,11 +14,7 @@ export async function signupSupervisor(
     const response = await apiClient
       .post(supervisorSignupUrl, supervisor)
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as Supervisor };
   } catch (error) {

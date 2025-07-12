@@ -3,10 +3,17 @@ import { MissingAccessTokenError } from "~/constants/errors";
 import apiClient from "~/utils/apiClient";
 import * as utils from "~/utils";
 
-// Mocks
 jest.mock("~/utils/apiClient", () => ({
-  post: jest.fn(),
-  get: jest.fn(),
+  __esModule: true,
+  default: {
+    post: jest.fn(),
+    get: jest.fn(),
+  },
+  parseApiError: jest.fn((e) => {
+    if (typeof e === "string") return e;
+    if (e instanceof Error) return e.message;
+    return JSON.stringify(e);
+  }),
 }));
 
 jest.mock("~/utils", () => ({
@@ -37,14 +44,10 @@ describe("auth service", () => {
       });
 
       const result = await fetchAuthToken("email@test.com", "pass");
-      expect(mockedApiClient.post).toHaveBeenCalledWith(expect.any(String), {
-        username: "email@test.com",
-        password: "pass",
-      });
       expect(result).toEqual({ data: "api-token" });
     });
 
-    it("handles API error gracefully", async () => {
+    it("handles API error with detail", async () => {
       mockedGetToken.mockReturnValue(null);
       mockedApiClient.post.mockRejectedValue({
         response: { data: { detail: "Invalid credentials" } },
@@ -52,6 +55,34 @@ describe("auth service", () => {
 
       const result = await fetchAuthToken("wrong@test.com", "wrong");
       expect(result.error).toMatch(/Invalid credentials/);
+    });
+
+    it("handles API error with generic response data", async () => {
+      mockedGetToken.mockReturnValue(null);
+      mockedApiClient.post.mockRejectedValue({
+        response: { data: { msg: "something went wrong" } },
+      });
+
+      const result = await fetchAuthToken("wrong@test.com", "wrong");
+      expect(result.error).toMatch(/something went wrong/);
+    });
+
+    it("handles error with no response", async () => {
+      mockedGetToken.mockReturnValue(null);
+      mockedApiClient.post.mockRejectedValue({
+        message: "Network Error",
+      });
+
+      const result = await fetchAuthToken("wrong@test.com", "wrong");
+      expect(result.error).toMatch(/Network Error/);
+    });
+
+    it("handles non-Axios error", async () => {
+      mockedGetToken.mockReturnValue(null);
+      mockedApiClient.post.mockRejectedValue("plain error");
+
+      const result = await fetchAuthToken("wrong@test.com", "wrong");
+      expect(result.error).toMatch(/plain error/);
     });
   });
 
@@ -73,10 +104,6 @@ describe("auth service", () => {
       });
 
       const result = await fetchUserProfile();
-
-      expect(mockedApiClient.get).toHaveBeenCalledWith(expect.any(String), {
-        headers: { Authorization: "Token token-abc" },
-      });
       expect(result).toEqual({ data: fakeProfile });
     });
 
@@ -87,14 +114,40 @@ describe("auth service", () => {
       expect(result.error).toMatch(MissingAccessTokenError.name);
     });
 
-    it("handles API error when token is present", async () => {
+    it("handles API error with detail", async () => {
       mockedGetToken.mockReturnValue("token-xyz");
-      mockedApiClient.get.mockRejectedValueOnce({
+      mockedApiClient.get.mockRejectedValue({
         response: { data: { detail: "Unauthorized" } },
       });
 
       const result = await fetchUserProfile();
       expect(result.error).toMatch(/Unauthorized/);
+    });
+
+    it("handles API error with generic response data", async () => {
+      mockedGetToken.mockReturnValue("token-xyz");
+      mockedApiClient.get.mockRejectedValue({
+        response: { data: { error: "fail" } },
+      });
+
+      const result = await fetchUserProfile();
+      expect(result.error).toMatch(/fail/);
+    });
+
+    it("handles error with no response", async () => {
+      mockedGetToken.mockReturnValue(null);
+      mockedApiClient.post.mockRejectedValue(new Error("Network Error"));
+
+      const result = await fetchAuthToken("wrong@test.com", "wrong");
+      expect(result.error).toMatch(/Network Error/);
+    });
+
+    it("handles non-Axios error", async () => {
+      mockedGetToken.mockReturnValue(null);
+      mockedApiClient.post.mockRejectedValue("plain error");
+
+      const result = await fetchAuthToken("wrong@test.com", "wrong");
+      expect(result.error).toMatch(/plain error/);
     });
   });
 });

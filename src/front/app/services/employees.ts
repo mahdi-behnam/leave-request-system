@@ -3,7 +3,7 @@ import { MissingAccessTokenError } from "~/constants/errors";
 import { employeeListUrl, employeeSignupUrl } from "~/constants/linksConfig";
 import type { Employee } from "~/types";
 import { getAccessTokenFromCookie } from "~/utils";
-import apiClient from "~/utils/apiClient";
+import apiClient, { parseApiError } from "~/utils/apiClient";
 
 export async function fetchEmployeesList(): Promise<{
   data: Employee[];
@@ -17,11 +17,7 @@ export async function fetchEmployeesList(): Promise<{
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as Employee[] };
   } catch (error) {
@@ -50,11 +46,7 @@ export async function signupEmployee(
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as Employee };
   } catch (error) {

@@ -10,10 +10,18 @@ import apiClient from "~/utils/apiClient";
 import * as utils from "~/utils";
 
 jest.mock("~/utils/apiClient", () => ({
-  get: jest.fn(),
-  post: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  },
+  parseApiError: jest.fn((e) => {
+    if (typeof e === "string") return e;
+    if (e instanceof Error) return e.message;
+    return JSON.stringify(e);
+  }),
 }));
 
 jest.mock("~/utils", () => ({

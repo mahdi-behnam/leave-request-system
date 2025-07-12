@@ -3,7 +3,7 @@ import { MissingAccessTokenError } from "~/constants/errors";
 import { authUrl, userProfileUrl } from "~/constants/linksConfig";
 import type { Employee, Supervisor } from "~/types";
 import { getAccessTokenFromCookie } from "~/utils";
-import apiClient from "~/utils/apiClient";
+import apiClient, { parseApiError } from "~/utils/apiClient";
 
 export async function fetchAuthToken(
   email: string,
@@ -21,11 +21,7 @@ export async function fetchAuthToken(
         password,
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
 
     return { data: response.data.token };
@@ -53,11 +49,7 @@ export async function fetchUserProfile(): Promise<{
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as Employee | Supervisor };
   } catch (error) {

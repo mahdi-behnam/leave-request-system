@@ -8,7 +8,7 @@ import {
 } from "~/constants/linksConfig";
 import type { LeaveRequest } from "~/types";
 import { getAccessTokenFromCookie } from "~/utils";
-import apiClient from "~/utils/apiClient";
+import apiClient, { parseApiError } from "~/utils/apiClient";
 
 export async function fetchLeaveRequestsList(): Promise<{
   data: LeaveRequest[];
@@ -22,11 +22,7 @@ export async function fetchLeaveRequestsList(): Promise<{
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as LeaveRequest[] };
   } catch (error) {
@@ -52,11 +48,7 @@ export async function createLeaveRequest(
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as LeaveRequest };
   } catch (error) {
@@ -85,11 +77,7 @@ export async function updateLeaveRequestStatus(
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { data: response.data as LeaveRequest };
   } catch (error) {
@@ -116,11 +104,7 @@ export async function deleteLeaveRequest(
         headers: { Authorization: `Token ${accessToken}` },
       })
       .catch((error) => {
-        if (error.response.data.detail)
-          throw new Error(error.response.data.detail);
-        else if (error.response.data)
-          throw new Error(JSON.stringify(error.response.data));
-        else throw new Error(error);
+        throw new Error(parseApiError(error));
       });
     return { error: undefined };
   } catch (error) {
