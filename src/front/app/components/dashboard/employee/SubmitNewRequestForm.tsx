@@ -99,22 +99,32 @@ const SubmitNewRequestForm: React.FC<Props> = ({ refreshTableCallback }) => {
       </Typography>
       <DateTimePicker
         label="Start Date"
+        slotProps={{
+          textField: { inputProps: { "data-testid": "start-date" } },
+        }}
         value={startDate}
         onChange={(newValue) => handleDateChange("startDate", newValue)}
       />
       <DateTimePicker
         label="End Date"
+        slotProps={{ textField: { inputProps: { "data-testid": "end-date" } } }}
         value={endDate}
         onChange={(newValue) => handleDateChange("endDate", newValue)}
       />
       <TextField
         label="Reason for Leave"
+        slotProps={{ htmlInput: { "data-testid": "reason-input" } }}
         multiline
         minRows={5}
         value={reason}
         onChange={(newValue) => handleReasonChange(newValue.target.value)}
       />
-      <Button variant="contained" type="submit" loading={isSubmitting}>
+      <Button
+        data-testid="submit-button"
+        variant="contained"
+        type="submit"
+        loading={isSubmitting}
+      >
         Submit
       </Button>
       <Collapse in={!!error.trim() && !isSubmitting}>

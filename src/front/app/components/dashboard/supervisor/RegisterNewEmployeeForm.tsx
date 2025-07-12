@@ -77,8 +77,8 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
 
   const validateFields = () => {
     const newErrors: typeof fieldErrors = {
-      firstName: firstName ? "" : "First name is required",
-      lastName: lastName ? "" : "Last name is required",
+      firstName: firstName.trim() ? "" : "First name is required",
+      lastName: lastName.trim() ? "" : "Last name is required",
       email: email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
         ? ""
         : "Invalid email address",
@@ -172,7 +172,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         Register a New Employee
       </Typography>
       <TextField
-        required
+        slotProps={{ htmlInput: { "data-testid": "first-name" } }}
         error={!!fieldErrors.firstName}
         label="First Name"
         value={firstName}
@@ -180,7 +180,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.firstName || ""}
       />
       <TextField
-        required
+        slotProps={{ htmlInput: { "data-testid": "last-name" } }}
         error={!!fieldErrors.lastName}
         label="Last Name"
         value={lastName}
@@ -188,7 +188,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.lastName || ""}
       />
       <TextField
-        required
+        slotProps={{ htmlInput: { "data-testid": "email" } }}
         error={!!fieldErrors.email}
         label="Email"
         value={email}
@@ -196,7 +196,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.email || ""}
       />
       <TextField
-        required
+        slotProps={{ htmlInput: { "data-testid": "national-id" } }}
         error={!!fieldErrors.nationalId}
         label="National ID"
         value={nationalId}
@@ -204,7 +204,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.nationalId || ""}
       />
       <TextField
-        required
+        slotProps={{ htmlInput: { "data-testid": "phone-number" } }}
         error={!!fieldErrors.phoneNumber}
         label="Phone Number"
         value={phoneNumber}
@@ -212,7 +212,7 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.phoneNumber || ""}
       />
       <TextField
-        required
+        slotProps={{ htmlInput: { "data-testid": "password" } }}
         type="password"
         error={!!fieldErrors.password}
         label="Password"
@@ -221,7 +221,9 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.password || ""}
       />
       <TextField
-        required
+        slotProps={{
+          htmlInput: { "data-testid": "leave-requests-count" },
+        }}
         type="number"
         error={!!fieldErrors.leaveRequestsCount}
         label="Leave Requests Count"
@@ -230,11 +232,20 @@ const RegisterNewEmployeeForm: React.FC<Props> = ({ refreshTableCallback }) => {
         helperText={fieldErrors.leaveRequestsCount || ""}
       />
 
-      <Button variant="contained" type="submit" loading={isSubmitting}>
+      <Button
+        data-testid="submit-button"
+        variant="contained"
+        type="submit"
+        loading={isSubmitting}
+      >
         Submit
       </Button>
       <Collapse in={!!registrationError.trim() && !isSubmitting}>
-        <Alert variant="standard" severity="error">
+        <Alert
+          data-testid="registration-error-alert"
+          variant="standard"
+          severity="error"
+        >
           {registrationError}
         </Alert>
       </Collapse>

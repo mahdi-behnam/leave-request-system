@@ -120,6 +120,7 @@ const LeaveRequestsTab = () => {
                 renderCell: (params) => (
                   <IconButton
                     color="error"
+                    data-testid="delete-button"
                     disabled={params.row.status !== "pending"}
                     onClick={() => handleDeleteBtn(params.row.id)}
                     loading={params.row.id === deletingRowId}

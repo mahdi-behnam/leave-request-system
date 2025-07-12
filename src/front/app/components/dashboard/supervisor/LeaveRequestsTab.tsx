@@ -136,6 +136,7 @@ const LeaveRequestsTab = () => {
                   <Stack direction="row" justifyContent="center" spacing={1}>
                     <IconButton
                       color="error"
+                      data-testid="reject-button"
                       disabled={params.row.status !== "pending"}
                       onClick={() => handleRejectBtn(params.row.id)}
                       loading={params.row.id === rejectingRowId}
@@ -144,6 +145,7 @@ const LeaveRequestsTab = () => {
                     </IconButton>
                     <IconButton
                       color="success"
+                      data-testid="approve-button"
                       disabled={params.row.status !== "pending"}
                       onClick={() => handleApproveBtn(params.row.id)}
                       loading={params.row.id === approvingRowId}

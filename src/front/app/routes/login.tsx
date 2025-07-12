@@ -102,6 +102,7 @@ export default function Login() {
       >
         <TextField
           required
+          slotProps={{ htmlInput: { "data-testid": "email-input" } }}
           label="Email"
           type="email"
           value={email}
@@ -111,12 +112,17 @@ export default function Login() {
           <InputLabel htmlFor="password-field">Password</InputLabel>
           <OutlinedInput
             id="password-field"
+            inputProps={{ "data-testid": "password-input" }}
             value={password}
             onChange={handlePasswordChange}
             type={showPassword ? "text" : "password"}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton onClick={handleClickShowPassword} edge="end">
+                <IconButton
+                  data-testid="toggle-password-visibility"
+                  onClick={handleClickShowPassword}
+                  edge="end"
+                >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
@@ -128,6 +134,7 @@ export default function Login() {
           <Link href="/register-supervisor">Create an account?</Link>
         )}
         <Button
+          data-testid="login-button"
           variant="contained"
           color="primary"
           fullWidth
