@@ -3,6 +3,7 @@ import * as Chrome from "selenium-webdriver/chrome";
 import { BASE_URL, CHROME_PATH, CHROMEDRIVER_PATH } from "./constants";
 import { waitForElement, waitForText } from "./utils";
 import { UserRole } from "~/types";
+import { employee1, supervisor1 } from "./users";
 
 jest.setTimeout(60000);
 
@@ -61,14 +62,14 @@ const login = async (userRole: UserRole, email: string, password: string) => {
 
 describe("Login Flow", () => {
   it("logs in as an employee and redirects to employee dashboard", async () => {
-    await login(UserRole.EMPLOYEE, "empEx@example.com", "password");
+    await login(UserRole.EMPLOYEE, employee1.email, employee1.password);
     await driver.wait(until.urlContains("/employee-dashboard"), 10000);
     const url = await driver.getCurrentUrl();
     expect(url).toContain("/employee-dashboard");
   });
 
   it("logs in as a supervisor and redirects to supervisor dashboard", async () => {
-    await login(UserRole.SUPERVISOR, "supervisor@mail.com", "password");
+    await login(UserRole.SUPERVISOR, supervisor1.email, supervisor1.password);
     await driver.wait(until.urlContains("/supervisor-dashboard"), 10000);
     const url = await driver.getCurrentUrl();
     expect(url).toContain("/supervisor-dashboard");
