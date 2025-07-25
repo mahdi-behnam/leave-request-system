@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test:e2e": "jest tests/e2e",
-    "test": "jest",
+    "test": "jest --testPathIgnorePatterns=tests/e2e/",
     "test:watch": "jest --watch",
     "build": "react-router build",
     "dev": "react-router dev",
