@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "test:e2e": "jest tests/e2e",
+    "test:e2e:headed": "npm run test:e2e --headless=false",
+    "test:e2e:headless": "npm run test:e2e --headless=true",
     "test": "jest --testPathIgnorePatterns=tests/e2e/",
     "test:watch": "jest --watch",
     "build": "react-router build",

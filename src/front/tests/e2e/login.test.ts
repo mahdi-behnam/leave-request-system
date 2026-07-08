@@ -1,6 +1,11 @@
 import { Builder, By, until, WebDriver, Browser } from "selenium-webdriver";
 import * as Chrome from "selenium-webdriver/chrome";
-import { BASE_URL, CHROME_PATH, CHROMEDRIVER_PATH } from "./constants";
+import {
+  BASE_URL,
+  CHROME_PATH,
+  CHROMEDRIVER_PATH,
+  E2E_HEADLESS,
+} from "./constants";
 import { waitForElement, waitForText } from "./utils";
 import { UserRole } from "~/types";
 import { employee1, supervisor1 } from "./users";
@@ -12,11 +17,11 @@ let driver: WebDriver;
 beforeEach(async () => {
   const options = new Chrome.Options();
   options.setChromeBinaryPath(CHROME_PATH);
-  options.addArguments(
-    "--headless=new",
-    "--no-sandbox",
-    "--disable-dev-shm-usage"
-  );
+  options.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+
+  if (E2E_HEADLESS) {
+    options.addArguments("--headless=new");
+  }
 
   const service = new Chrome.ServiceBuilder(CHROMEDRIVER_PATH);
 
